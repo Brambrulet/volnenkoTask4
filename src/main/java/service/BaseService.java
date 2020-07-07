@@ -1,15 +1,14 @@
 package service;
 
-import entity.Role;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.persistence.NoResultException;
-import javax.persistence.PersistenceException;
 import lombok.Getter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.springframework.util.StringUtils;
 import repository.BaseRepository;
 
 public class BaseService<T, R extends BaseRepository<T>> {
@@ -40,15 +39,19 @@ public class BaseService<T, R extends BaseRepository<T>> {
     }
 
     public T findById(long id) {
-        return tryExecuteAndReturn(session -> repository.findById(session, id));
+        return tryExecuteQuery(session -> repository.findById(session, id));
     }
 
     public T findByName(String name) {
-        return tryExecuteAndReturn(session -> repository.findByName(session, name));
+        assert !StringUtils.isEmpty(name);
+
+        return tryExecuteQuery(session -> repository.findByName(session, name));
     }
 
     public T findByField(String fieldName, Object value) {
-        return tryExecuteAndReturn(session -> repository.findByField(session, fieldName, value));
+        assert !StringUtils.isEmpty(fieldName);
+
+        return tryExecuteQuery(session -> repository.findByField(session, fieldName, value));
     }
 
     Session getSession() {
@@ -62,11 +65,11 @@ public class BaseService<T, R extends BaseRepository<T>> {
     }
 
     public void execute(Consumer<Session> consumer) {
-        executeAndReturn(s -> {consumer.accept(s); return (Void)null;});
+        executeQuery(s -> {consumer.accept(s); return (Void)null;});
     }
 
-    public <X> X tryExecuteAndReturn(Function<Session, X> function) {
-        return executeAndReturn(s -> {
+    public <X> X tryExecuteQuery(Function<Session, X> function) {
+        return executeQuery(s -> {
             try {
                 return function.apply(s);
             } catch (NoResultException e) {
@@ -75,7 +78,7 @@ public class BaseService<T, R extends BaseRepository<T>> {
         });
     }
 
-    public <X> X executeAndReturn(Function<Session, X> function) {
+    public <X> X executeQuery(Function<Session, X> function) {
         assert !Objects.isNull(function);
 
         boolean localTransaction = !session.getTransaction().isActive();

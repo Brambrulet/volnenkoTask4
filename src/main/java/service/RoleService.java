@@ -48,7 +48,7 @@ public class RoleService extends BaseService<Role, RoleRepository> {
     private Role findOrCreateRole(Session session, String roleName) {
         assert !Objects.isNull(session) || !StringUtils.isEmpty(roleName);
 
-        return executeAndReturn(s -> {
+        return executeQuery(s -> {
             Role admin = findByName(roleName);
 
             if (Objects.isNull(admin)) {
