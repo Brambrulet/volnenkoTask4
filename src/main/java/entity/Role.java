@@ -12,16 +12,14 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Entity
 @Table(name = "T_ROLE")
 @Data
+@Accessors(chain = true)
 @NoArgsConstructor
-public class Role {
-
-    @Id
-    @GeneratedValue
-    private Long id;
+public class Role extends IndexedComparableEntity {
 
     @Column(unique = true)
     private String name;
@@ -29,8 +27,4 @@ public class Role {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "role_id")
     private Set<User> users;
-
-    public Role(String name) {
-        this.name = name;
-    }
 }

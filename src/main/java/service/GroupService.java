@@ -5,12 +5,14 @@ import entity.User;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import org.springframework.util.StringUtils;
+import repository.BaseRepository;
 import repository.GroupRepository;
 
 public class GroupService extends BaseService<Group, GroupRepository> {
 
-    public GroupService(BaseService baseService) {
+    public <T, R extends BaseRepository<T>> GroupService(BaseService<T, R> baseService) {
         super(baseService, new GroupRepository());
     }
 
@@ -18,10 +20,10 @@ public class GroupService extends BaseService<Group, GroupRepository> {
         super(new GroupRepository());
     }
 
-    public Group createGroup(String name) {
+    public Group createGroup(String name, Set<User> users) {
         assert !StringUtils.isEmpty(name);
 
-        return persist(new Group(name));
+        return persist(new Group().setName(name).setUsers(users));
     }
 
     public void addAllUsersToGroup(Group group) {

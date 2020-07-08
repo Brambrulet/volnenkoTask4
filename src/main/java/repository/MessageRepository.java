@@ -3,11 +3,8 @@ package repository;
 import entity.Group;
 import entity.Message;
 import entity.User;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import org.hibernate.Session;
 import pojo.MessageInfo;
@@ -57,7 +54,7 @@ public class MessageRepository extends BaseRepository<Message> {
     }
 
     public Message createMessage(Session session, User sender, User recipient, Group group, String message) {
-        Message msg = Message.builder().sender(sender).recipient(recipient).group(group).message(message).build();
+        Message msg = new Message().setSender(sender).setRecipient(recipient).setGroup(group).setMessage(message);
         session.persist(msg);
 
         return msg;

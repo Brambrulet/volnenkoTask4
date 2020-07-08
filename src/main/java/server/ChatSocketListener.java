@@ -10,6 +10,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -108,11 +109,7 @@ public class ChatSocketListener implements Runnable {
 
     private boolean prepareNewCommand() {
         if (COMMAND_NEW.equals(json.getString(KEY_COMMAND)) && json.has(KEY_GROUP) && userService.isAdmin(user)) {
-            groupService.execute(session -> {
-                Group group = groupService.createGroup(json.getString(KEY_GROUP));
-                group.getUsers().add(user);
-                session.persist(group);
-            });
+            groupService.createGroup(json.getString(KEY_GROUP), Collections.singleton(user));
 
             return true;
         }
