@@ -43,7 +43,7 @@ public class GroupService extends BaseService<Group, GroupRepository> {
     }
 
     public List<Group> getNotEmptyGroups() {
-        List<Group> result = executeAndReturn(repository::getNotEmptyGroups);
+        List<Group> result = executeQuery(repository::getNotEmptyGroups);
 
         return Objects.isNull(result) ? Collections.emptyList() : result;
     }
