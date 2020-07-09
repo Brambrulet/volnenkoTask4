@@ -22,11 +22,11 @@ public class RoleService extends BaseService<Role, RoleRepository> {
     }
 
     public Role getAdminRole() {
-        return findOrCreateRole(getSession(), ADMIN_ROLE_NAME);
+        return findOrCreateRole(ADMIN_ROLE_NAME);
     }
 
     public Role getUserRole() {
-        return findOrCreateRole(getSession(), USER_ROLE_NAME);
+        return findOrCreateRole(USER_ROLE_NAME);
     }
 
     public static boolean isAdmin(Role role) {
@@ -35,17 +35,9 @@ public class RoleService extends BaseService<Role, RoleRepository> {
         return ADMIN_ROLE_NAME.equals(role.getName());
     }
 
-    private Role findOrCreateRole(Session session, String roleName) {
-        assert !Objects.isNull(session) || !StringUtils.isEmpty(roleName);
+    private Role findOrCreateRole(String roleName) {
+        assert !StringUtils.isEmpty(roleName);
 
-        return executeQuery(s -> {
-            Role admin = findByName(roleName);
-
-            if (Objects.isNull(admin)) {
-                admin = persist(new Role().setName(roleName));
-            }
-
-            return admin;
-        });
+        return executeQuery(s -> findByName(roleName).orElseGet(() -> persist(new Role().setName(roleName))));
     }
 }

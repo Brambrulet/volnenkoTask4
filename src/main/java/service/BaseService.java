@@ -1,6 +1,7 @@
 package service;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.persistence.NoResultException;
@@ -42,13 +43,13 @@ public class BaseService<T, R extends BaseRepository<T>> {
         return tryExecuteQuery(session -> repository.findById(session, id));
     }
 
-    public T findByName(String name) {
+    public Optional<T> findByName(String name) {
         assert !StringUtils.isEmpty(name);
 
         return tryExecuteQuery(session -> repository.findByName(session, name));
     }
 
-    public T findByField(String fieldName, Object value) {
+    public Optional<T> findByField(String fieldName, Object value) {
         assert !StringUtils.isEmpty(fieldName);
 
         return tryExecuteQuery(session -> repository.findByField(session, fieldName, value));

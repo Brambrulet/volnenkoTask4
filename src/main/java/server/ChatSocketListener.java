@@ -97,8 +97,8 @@ public class ChatSocketListener implements Runnable {
         if (COMMAND_INVITE.equals(json.optString(KEY_COMMAND))
                 && json.has(KEY_GROUP) && json.has(KEY_RECIPIENT)) {
             groupService.addUserToGroup(
-                    groupService.findByName(json.getString(KEY_GROUP)),
-                    userService.findByName(json.getString(KEY_RECIPIENT))
+                    groupService.findByName(json.getString(KEY_GROUP)).orElseThrow(() -> new RuntimeException("group not found")),
+                    userService.findByName(json.getString(KEY_RECIPIENT)).orElseThrow(() -> new RuntimeException("recipient not found"))
             );
 
             return true;
@@ -123,9 +123,9 @@ public class ChatSocketListener implements Runnable {
             User recipient = null;
 
             if (existKey(KEY_GROUP)) {
-                group = groupService.findByName(json.getString(KEY_GROUP));
+                group = groupService.findByName(json.getString(KEY_GROUP)).orElseThrow(() -> new RuntimeException("group not found"));
             } else if (existKey(KEY_RECIPIENT)) {
-                recipient = userService.findByName(json.getString(KEY_RECIPIENT));
+                recipient = userService.findByName(json.getString(KEY_RECIPIENT)).orElseThrow(() -> new RuntimeException("recipient not found"));
             }
 
             messageService.createMessage(user, recipient, group, json.getString(KEY_MESSAGE));
@@ -146,9 +146,9 @@ public class ChatSocketListener implements Runnable {
             LocalDateTime timestamp = LocalDateTime.parse(json.getString(KEY_TIMESTAMP));
 
             if (existKey(KEY_GROUP)) {
-                messages = messageService.getMessagesFor(user, timestamp, groupService.findByName(json.getString(KEY_GROUP)));
+                messages = messageService.getMessagesFor(user, timestamp, groupService.findByName(json.getString(KEY_GROUP)).orElseThrow(() -> new RuntimeException("group not found")));
             } else if (existKey(KEY_RECIPIENT)) {
-                messages = messageService.getMessagesFor(user, timestamp, userService.findByName(json.getString(KEY_RECIPIENT)));
+                messages = messageService.getMessagesFor(user, timestamp, userService.findByName(json.getString(KEY_RECIPIENT)).orElseThrow(() -> new RuntimeException("recipient not found")));
             } else {
                 messages = messageService.getBroadcastMessagesFor(user, timestamp);
             }
@@ -189,13 +189,9 @@ public class ChatSocketListener implements Runnable {
     }
 
     private void checkUser() throws IOException {
-        user = userService.findByName(json.getString(KEY_NAME));
+        user = userService.findByName(json.getString(KEY_NAME)).orElseGet(this::registerNewUser);
 
-        if (Objects.isNull(user)) {
-            registerNewUser();
-        } else {
-            checkPassword();
-        }
+        checkPassword();
     }
 
     private void checkPassword() throws IOException {
@@ -204,8 +200,8 @@ public class ChatSocketListener implements Runnable {
         }
     }
 
-    private void registerNewUser() {
-        user = userService.createUser(json.getString(KEY_NAME), json.getString(KEY_PASSWORD), false);
+    private User registerNewUser() {
+        return userService.createUser(json.getString(KEY_NAME), json.getString(KEY_PASSWORD), false);
     }
 
 
