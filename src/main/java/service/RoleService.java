@@ -2,8 +2,10 @@ package service;
 
 import entity.Role;
 import java.util.Objects;
+import lombok.NoArgsConstructor;
 import org.hibernate.Session;
 import org.springframework.util.StringUtils;
+import repository.BaseRepository;
 import repository.RoleRepository;
 
 public class RoleService extends BaseService<Role, RoleRepository> {
@@ -11,24 +13,12 @@ public class RoleService extends BaseService<Role, RoleRepository> {
     public static final String ADMIN_ROLE_NAME = "Admin";
     public static final String USER_ROLE_NAME = "User";
 
-    public RoleService(BaseService baseService) {
+    public <T, R extends BaseRepository<T>> RoleService(BaseService<T, R> baseService) {
         super(baseService, new RoleRepository());
     }
 
     public RoleService() {
         super(new RoleRepository());
-    }
-
-    public Role getAdminRole(Session session) {
-        assert !Objects.isNull(session);
-
-        return findOrCreateRole(session, ADMIN_ROLE_NAME);
-    }
-
-    public Role getUserRole(Session session) {
-        assert !Objects.isNull(session);
-
-        return findOrCreateRole(session, USER_ROLE_NAME);
     }
 
     public Role getAdminRole() {
@@ -42,7 +32,7 @@ public class RoleService extends BaseService<Role, RoleRepository> {
     public static boolean isAdmin(Role role) {
         assert !Objects.isNull(role);
 
-        return !Objects.isNull(role) && ADMIN_ROLE_NAME.equals(role.getName());
+        return ADMIN_ROLE_NAME.equals(role.getName());
     }
 
     private Role findOrCreateRole(Session session, String roleName) {
@@ -52,8 +42,7 @@ public class RoleService extends BaseService<Role, RoleRepository> {
             Role admin = findByName(roleName);
 
             if (Objects.isNull(admin)) {
-                admin = new Role(roleName);
-                persist(admin);
+                admin = persist(new Role().setName(roleName));
             }
 
             return admin;

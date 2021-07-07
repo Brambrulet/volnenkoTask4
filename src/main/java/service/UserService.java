@@ -6,12 +6,13 @@ import java.util.Objects;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
+import repository.BaseRepository;
 import repository.UserRepository;
 
 public class UserService extends BaseService<User, UserRepository> {
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public UserService(BaseService baseService) {
+    public <T, R extends BaseRepository<T>> UserService(BaseService<T, R> baseService) {
         super(baseService, new UserRepository());
     }
 
@@ -38,9 +39,9 @@ public class UserService extends BaseService<User, UserRepository> {
 
         return executeQuery(session -> {
             RoleService roleService = new RoleService(this);
-            Role role = admin ? roleService.getAdminRole(session) : roleService.getUserRole(session);
+            Role role = admin ? roleService.getAdminRole() : roleService.getUserRole();
 
-            return persist(User.builder().name(name).password(passwordEncoder.encode(passw)).role(role).build());
+            return persist(new User().setName(name).setPassword(passwordEncoder.encode(passw)).setRole(role));
         });
     }
 

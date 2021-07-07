@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.util.StringUtils;
 import pojo.MessageInfo;
+import repository.BaseRepository;
 import repository.MessageRepository;
 
 public class MessageService extends BaseService<Message, MessageRepository> {
@@ -16,7 +17,7 @@ public class MessageService extends BaseService<Message, MessageRepository> {
         super(new MessageRepository());
     }
 
-    public MessageService(BaseService service) {
+    public <T, R extends BaseRepository<T>> MessageService(BaseService<T, R> service) {
         super(service, new MessageRepository());
     }
 

@@ -25,6 +25,10 @@
         <mapping class="entity.User"/>
         <mapping class="entity.Group"/>
         <mapping class="entity.Message"/>
+        <mapping class="entity.Settings"/>
+        <mapping class="entity.DeveloperSettings"/>
+        <mapping class="entity.SystemOsSettings"/>
+        <mapping class="entity.SystemMemSettings"/>
 
     </session-factory>
 </hibernate-configuration>
